@@ -1,0 +1,6 @@
+import { useEffect, useState } from 'react';
+import { adminService } from '../../services/admin.service';
+import type { Dashboard } from '../../types/admin.types';
+import { ErrorState, LoadingState } from '../../components/AsyncState';
+const labels: Record<keyof Dashboard, string> = { resourceCount: 'Nhóm dữ liệu', totalRecords: 'Tổng bản ghi', activeAccounts: 'Tài khoản hoạt động', users: 'Người dùng', projects: 'Dự án', services: 'Dịch vụ', portfolios: 'Portfolio', reports: 'Báo cáo', transactions: 'Giao dịch' };
+export function DashboardPage() { const [data, setData] = useState<Dashboard>(); const [error, setError] = useState(''); const load = () => { setError(''); adminService.dashboard().then(setData).catch(e => setError(e.message)); }; useEffect(load, []); if (error) return <ErrorState message={error} retry={load} />; if (!data) return <LoadingState />; return <><div className="page-title"><div><p>TRUNG TÂM ĐIỀU HÀNH</p><h1>Tổng quan hệ thống</h1></div><span>Cập nhật trực tiếp từ DB</span></div><div className="metrics">{(Object.keys(labels) as (keyof Dashboard)[]).map(key => <article key={key}><small>{labels[key]}</small><strong>{data[key].toLocaleString('vi-VN')}</strong></article>)}</div></>; }
