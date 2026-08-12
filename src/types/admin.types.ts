@@ -4,5 +4,7 @@ export type AdminField = { name: string; type: string; nullable: boolean; editab
 export type AdminResource = { key: string; name: string; table: string; keyField: string; canCreate: boolean; canEdit: boolean; canSoftDelete: boolean; canRestore: boolean; fields: AdminField[] };
 export type AdminPage = { resource: string; page: number; pageSize: number; total: number; items: Record<string, unknown>[] };
 export type AdminRecord = { resource: string; data: Record<string, unknown> };
+export type AdminRelatedSection = { resource: string; total: number; items: Record<string, unknown>[] };
+export type AdminOverview = { resource: string; id: string; sections: AdminRelatedSection[] };
 export type Dashboard = { resourceCount: number; totalRecords: number; activeAccounts: number; users: number; projects: number; services: number; portfolios: number; reports: number; transactions: number };
 export type BulkResult = { requested: number; succeeded: number; failed: number };

@@ -5,8 +5,9 @@ import type { AdminResource } from '../types/admin.types';
 import { useAuth } from '../store/auth-context';
 import { resourceGroup } from '../config/resource-groups';
 import { AppIcon } from '../components/AppIcon';
+import { primaryResources, resourceLabel } from '../config/admin-i18n';
 
-const groupIcons: Record<string, string> = { 'Tài khoản & hồ sơ': 'users', 'Nội dung sáng tạo': 'content', 'Dự án & đơn hàng': 'projects', 'Tài chính & tranh chấp': 'finance', 'Giao tiếp & vận hành': 'operations', 'Hệ thống & tích hợp': 'system', Khác: 'database' };
+const groupIcons: Record<string,string> = { 'Người dùng':'users','Nội dung sáng tạo':'content','Công việc và giao dịch':'projects','Cộng đồng':'operations','Tài chính':'finance','Vận hành':'system',Khác:'database' };
 
 export function AdminLayout() {
   const [resources, setResources] = useState<AdminResource[]>([]);
@@ -18,7 +19,7 @@ export function AdminLayout() {
   const location = useLocation();
   useEffect(() => { adminService.resources().then(setResources).catch(() => setResources([])); }, []);
   useEffect(() => setMobileOpen(false), [location.pathname]);
-  const filtered = useMemo(() => resources.filter(x => `${x.name} ${x.table}`.toLowerCase().includes(query.trim().toLowerCase())), [resources, query]);
+  const filtered = useMemo(() => resources.filter(x => primaryResources.has(x.key) && `${resourceLabel(x.key,x.name)} ${x.table}`.toLowerCase().includes(query.trim().toLowerCase())), [resources, query]);
   const groups = [...new Set(filtered.map(x => resourceGroup(x.key)))];
   const activeResource = resources.find(x => location.pathname.includes(`/resources/${x.key}`));
   function toggleCompact() { setCompact(value => { localStorage.setItem('admin_sidebar_compact', value ? '0' : '1'); return !value; }); }
@@ -34,14 +35,14 @@ export function AdminLayout() {
         <div className="nav-separator"><span>Không gian quản trị</span></div>
         {groups.map(group => <section className="nav-group" key={group}>
           <button className="nav-group-title" onClick={() => toggleGroup(group)} aria-expanded={!closedGroups.includes(group)}><span className="nav-icon"><AppIcon name={groupIcons[group]}/></span><span className="nav-text">{group}</span><AppIcon name="chevron" className={`group-arrow ${closedGroups.includes(group) ? '' : 'expanded'}`}/></button>
-          {!closedGroups.includes(group) && <div className="nav-group-items">{filtered.filter(x => resourceGroup(x.key) === group).map(x => <NavLink key={x.key} to={`/resources/${x.key}`} className="resource-link"><span className="resource-dot"/><span className="nav-text">{x.name}</span></NavLink>)}</div>}
+          {!closedGroups.includes(group) && <div className="nav-group-items">{filtered.filter(x => resourceGroup(x.key) === group).map(x => <NavLink key={x.key} to={`/resources/${x.key}`} className="resource-link"><span className="resource-dot"/><span className="nav-text">{resourceLabel(x.key,x.name)}</span></NavLink>)}</div>}
         </section>)}
         {filtered.length === 0 && <p className="nav-empty">Không tìm thấy dữ liệu</p>}
       </nav>
       <footer className="sidebar-footer"><div className="admin-avatar">{initials(user?.displayName)}</div><div className="admin-copy"><strong>{user?.displayName}</strong><small>Quản trị viên</small></div><button onClick={() => void signOut()} aria-label="Đăng xuất" title="Đăng xuất"><AppIcon name="logout"/></button></footer>
     </aside>
     <div className="workspace">
-      <header className="topbar"><button className="menu" onClick={() => setMobileOpen(true)} aria-label="Mở menu"><AppIcon name="menu"/></button><div className="breadcrumb"><span>Quản trị</span><AppIcon name="chevron"/>{activeResource ? <strong>{activeResource.name}</strong> : <strong>Tổng quan</strong>}</div><div className="topbar-status"><span className="online-dot"/><span>Hệ thống hoạt động</span></div><button className="topbar-logout" onClick={() => void signOut()}><AppIcon name="logout"/><span>Đăng xuất</span></button></header>
+      <header className="topbar"><button className="menu" onClick={() => setMobileOpen(true)} aria-label="Mở menu"><AppIcon name="menu"/></button><div className="breadcrumb"><span>Quản trị</span><AppIcon name="chevron"/>{activeResource ? <strong>{resourceLabel(activeResource.key,activeResource.name)}</strong> : <strong>Tổng quan</strong>}</div><div className="topbar-status"><span className="online-dot"/><span>Hệ thống hoạt động</span></div><button className="topbar-logout" onClick={() => void signOut()}><AppIcon name="logout"/><span>Đăng xuất</span></button></header>
       <main id="main-content"><Outlet context={{ resources }} /></main>
     </div>
   </div>;
