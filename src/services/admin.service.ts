@@ -1,4 +1,4 @@
-import { apiRequest } from './api-client';
+import { apiRequest, uploadRequest } from './api-client';
 import type { AdminOverview, AdminPage, AdminRecord, AdminResource, BulkResult, Dashboard } from '../types/admin.types';
 import { resourcePath } from './resource-path';
 export const adminService = {
@@ -11,5 +11,10 @@ export const adminService = {
   update: (key: string, id: string, values: Record<string, unknown>) => apiRequest<AdminRecord>(resourcePath(key, id), { method: 'PATCH', body: JSON.stringify({ values }) }),
   softDelete: (key: string, id: string) => apiRequest(`${resourcePath(key, id)}/soft-delete`, { method: 'PATCH' }),
   restore: (key: string, id: string) => apiRequest<AdminRecord>(`${resourcePath(key, id)}/restore`, { method: 'PATCH' }),
-  bulk: (key: string, action: 'soft-delete' | 'restore', ids: string[]) => apiRequest<BulkResult>(`${resourcePath(key)}/bulk/${action}`, { method: 'POST', body: JSON.stringify({ ids }) })
+  bulk: (key: string, action: 'soft-delete' | 'restore', ids: string[]) => apiRequest<BulkResult>(`${resourcePath(key)}/bulk/${action}`, { method: 'POST', body: JSON.stringify({ ids }) }),
+  uploadImage: (file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    return uploadRequest<{ publicUrl: string }>('/api/admin/media/images', form);
+  }
 };

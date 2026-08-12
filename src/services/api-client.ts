@@ -27,3 +27,7 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}, retry 
   if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }
+
+export function uploadRequest<T>(path: string, form: FormData) {
+  return apiRequest<T>(path, { method: 'POST', body: form });
+}
