@@ -2,20 +2,21 @@ import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'r
 import type { AdminField, AdminResource } from '../types/admin.types';
 import { fieldHint, fieldLabel, valueLabel } from '../config/admin-i18n';
 import { adminService } from '../services/admin.service';
-import { isImageField, isResourceFormField } from '../utils/field-presentation';
+import { campaignDateError, defaultEditorValue, isImageField, isResourceFormField } from '../utils/field-presentation';
 import { AppIcon } from './AppIcon';
 
 type Props={resource:AdminResource;data:Record<string,unknown>;busy:boolean;onSave:(values:Record<string,unknown>)=>Promise<void>;onCancel:()=>void};
 
 export function RecordEditor({resource,data,busy,onSave,onCancel}:Props){
  const fields=resource.fields.filter(x=>x.editable&&isResourceFormField(resource.key,x.name));
- const [values,setValues]=useState<Record<string,string>>(()=>Object.fromEntries(fields.map(x=>[x.name,data[x.name]==null?'':String(data[x.name])])));
+ const [values,setValues]=useState<Record<string,string>>(()=>Object.fromEntries(fields.map(x=>[x.name,defaultEditorValue(x.type,x.options,data[x.name])])));
  const [uploading,setUploading]=useState('');
  const [uploadError,setUploadError]=useState('');
+ const [validationError,setValidationError]=useState('');
  const [previews,setPreviews]=useState<Record<string,string>>({});
  useEffect(()=>()=>Object.values(previews).forEach(URL.revokeObjectURL),[previews]);
 
- async function submit(event:FormEvent){event.preventDefault();const changed:Record<string,unknown>={};fields.forEach(field=>{if(values[field.name]!==String(data[field.name]??''))changed[field.name]=parseValue(field.type,values[field.name],field.nullable);});await onSave(changed);}
+ async function submit(event:FormEvent){event.preventDefault();setValidationError('');if(resource.key==='campaigns'){const error=campaignDateError(values.StartsAt,values.EndsAt);if(error){setValidationError(error);return;}}const changed:Record<string,unknown>={};fields.forEach(field=>{if(values[field.name]!==String(data[field.name]??''))changed[field.name]=parseValue(field.type,values[field.name],field.nullable);});await onSave(changed);}
  async function selectImage(field:AdminField,event:ChangeEvent<HTMLInputElement>){
   const file=event.target.files?.[0]; if(!file)return;
   setUploadError('');
@@ -29,7 +30,7 @@ export function RecordEditor({resource,data,busy,onSave,onCancel}:Props){
 
  return <form className="editor" onSubmit={submit}>
   {fields.map(field=>isImageField(field.name)?<ImageField key={field.name} field={field} value={values[field.name]} preview={previews[field.name]} uploading={uploading===field.name} onSelect={selectImage} required={resource.key==='campaigns'&&field.name==='CoverUrl'}/>:<label key={field.name}><span className="field-label-row"><span>{fieldLabel(field.name)}{!field.nullable&&' *'}</span>{fieldHint(field.name)&&<small>{fieldHint(field.name)}</small>}</span>{field.options?<select value={values[field.name]} onChange={e=>setValues(v=>({...v,[field.name]:e.target.value}))}>{field.nullable&&<option value="">—</option>}{field.options.filter(x=>x!=='Deleted').map(x=><option key={x} value={x}>{String(valueLabel(x))}</option>)}</select>:field.type==='Boolean'?<select value={values[field.name]} onChange={e=>setValues(v=>({...v,[field.name]:e.target.value}))}><option value="true">Có</option><option value="false">Không</option></select>:field.type==='DateTimeOffset'?<DateTimeField label={fieldLabel(field.name)} value={values[field.name]} onChange={value=>setValues(v=>({...v,[field.name]:value}))}/>:<input value={values[field.name]} maxLength={field.maxLength||undefined} type={['Int16','Int32','Int64','Decimal'].includes(field.type)?'number':'text'} onChange={e=>setValues(v=>({...v,[field.name]:e.target.value}))}/>}</label>)}
-  {uploadError&&<p className="editor-error" role="alert">{uploadError}</p>}
+  {(uploadError||validationError)&&<p className="editor-error" role="alert">{uploadError||validationError}</p>}
   <div className="editor-actions"><button type="button" className="quiet" onClick={onCancel}>Hủy</button><button disabled={busy||Boolean(uploading)||fields.length===0}>{busy?'Đang lưu…':'Lưu thay đổi'}</button></div>
  </form>;
 }

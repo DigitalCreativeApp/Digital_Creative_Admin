@@ -18,6 +18,19 @@ export function isResourceFormField(resourceKey: string, fieldName: string) {
   return resourceKey !== 'campaigns' || campaignFormFields.has(fieldName);
 }
 
+export function campaignDateError(startsAt: string, endsAt: string) {
+  if (!startsAt || !endsAt) return 'Vui lòng chọn ngày bắt đầu và ngày kết thúc.';
+  if (new Date(endsAt).getTime() <= new Date(startsAt).getTime()) return 'Ngày kết thúc phải sau ngày bắt đầu.';
+  return '';
+}
+
+export function defaultEditorValue(type: string, options: string[] | null, value: unknown) {
+  if (value !== null && value !== undefined) return String(value);
+  if (options?.length) return options.find(option => option !== 'Deleted') ?? '';
+  if (type === 'Boolean') return 'true';
+  return '';
+}
+
 export type FieldGroup = 'media' | 'primary' | 'content' | 'status' | 'system';
 
 export function fieldGroup(name: string): FieldGroup {
