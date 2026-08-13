@@ -1,5 +1,7 @@
+import { formatVietnamDateTime, isIsoDateTime } from './date-time';
+
 export function toCsv(rows: Record<string, unknown>[], columns: string[]) {
-  const escape = (value: unknown) => `"${String(value ?? '').replaceAll('"', '""')}"`;
+  const escape = (value: unknown) => `"${String(isIsoDateTime(value) ? formatVietnamDateTime(value) : value ?? '').replaceAll('"', '""')}"`;
   return [columns.map(escape).join(','), ...rows.map(row => columns.map(key => escape(row[key])).join(','))].join('\r\n');
 }
 

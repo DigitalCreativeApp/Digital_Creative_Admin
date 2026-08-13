@@ -4,19 +4,20 @@ import { fieldHint, fieldLabel, valueLabel } from '../config/admin-i18n';
 import { adminService } from '../services/admin.service';
 import { campaignDateError, defaultEditorValue, isImageField, isResourceFormField } from '../utils/field-presentation';
 import { AppIcon } from './AppIcon';
+import { fromVietnamDateTimeInput, toVietnamDateTimeInput } from '../utils/date-time';
 
 type Props={resource:AdminResource;data:Record<string,unknown>;busy:boolean;onSave:(values:Record<string,unknown>)=>Promise<void>;onCancel:()=>void};
 
 export function RecordEditor({resource,data,busy,onSave,onCancel}:Props){
  const fields=resource.fields.filter(x=>x.editable&&isResourceFormField(resource.key,x.name));
- const [values,setValues]=useState<Record<string,string>>(()=>Object.fromEntries(fields.map(x=>[x.name,defaultEditorValue(x.type,x.options,data[x.name])])));
+ const [values,setValues]=useState<Record<string,string>>(()=>Object.fromEntries(fields.map(x=>[x.name,x.type==='DateTimeOffset'?toVietnamDateTimeInput(data[x.name]):defaultEditorValue(x.type,x.options,data[x.name])])));
  const [uploading,setUploading]=useState('');
  const [uploadError,setUploadError]=useState('');
  const [validationError,setValidationError]=useState('');
  const [previews,setPreviews]=useState<Record<string,string>>({});
  useEffect(()=>()=>Object.values(previews).forEach(URL.revokeObjectURL),[previews]);
 
- async function submit(event:FormEvent){event.preventDefault();setValidationError('');if(resource.key==='campaigns'){const error=campaignDateError(values.StartsAt,values.EndsAt);if(error){setValidationError(error);return;}}const changed:Record<string,unknown>={};fields.forEach(field=>{if(values[field.name]!==String(data[field.name]??''))changed[field.name]=parseValue(field.type,values[field.name],field.nullable);});await onSave(changed);}
+ async function submit(event:FormEvent){event.preventDefault();setValidationError('');if(resource.key==='campaigns'){const error=campaignDateError(values.StartsAt,values.EndsAt);if(error){setValidationError(error);return;}}const changed:Record<string,unknown>={};fields.forEach(field=>{const original=field.type==='DateTimeOffset'?toVietnamDateTimeInput(data[field.name]):String(data[field.name]??'');if(values[field.name]!==original)changed[field.name]=parseValue(field.type,values[field.name],field.nullable);});await onSave(changed);}
  async function selectImage(field:AdminField,event:ChangeEvent<HTMLInputElement>){
   const file=event.target.files?.[0]; if(!file)return;
   setUploadError('');
@@ -46,4 +47,4 @@ function ImageField({field,value,preview,uploading,onSelect,required=false}:{fie
  return <div className="image-field"><div className="image-field-label"><span>{fieldLabel(field.name)}{(!field.nullable||required)&&' *'}</span><small>JPG, PNG hoặc WebP · tối đa 10 MB</small></div><div className="image-picker">{image?<img src={image} alt={`Xem trước ${fieldLabel(field.name)}`}/>:<div className="image-placeholder">Chưa có ảnh</div>}<label className="file-button"><input type="file" accept="image/jpeg,image/png,image/webp" onChange={event=>void onSelect(field,event)} disabled={uploading} required={required&&!image}/><span>{uploading?'Đang tải lên…':'Chọn ảnh từ máy tính'}</span></label></div></div>;
 }
 
-function parseValue(type:string,value:string,nullable:boolean){if(value===''&&nullable)return null;if(type==='Boolean')return value==='true';if(['Int16','Int32','Int64','Decimal'].includes(type))return Number(value);return value;}
+function parseValue(type:string,value:string,nullable:boolean){if(value===''&&nullable)return null;if(type==='DateTimeOffset')return fromVietnamDateTimeInput(value);if(type==='Boolean')return value==='true';if(['Int16','Int32','Int64','Decimal'].includes(type))return Number(value);return value;}
