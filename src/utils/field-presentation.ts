@@ -15,7 +15,9 @@ export function isImageUrl(value: unknown) {
 
 const campaignFormFields = new Set(['CoverUrl', 'StartsAt', 'EndsAt', 'IsFeatured', 'Status', 'TargetUrl']);
 export function isResourceFormField(resourceKey: string, fieldName: string) {
-  return resourceKey !== 'campaigns' || campaignFormFields.has(fieldName);
+  if (resourceKey === 'campaigns') return campaignFormFields.has(fieldName);
+  if (resourceKey === 'professions') return fieldName !== 'SortOrder';
+  return true;
 }
 
 export function campaignDateError(startsAt: string, endsAt: string) {

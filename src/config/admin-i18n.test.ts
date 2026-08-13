@@ -15,4 +15,8 @@ describe('campaign field presentation', () => {
     expect(fieldHint('StartsAt')).toContain('nhập');
     expect(fieldHint('TargetUrl')).toContain('mở');
   });
+
+  it('labels profession icon uploads clearly', () => {
+    expect(fieldLabel('IconUrl')).toBe('Biểu tượng');
+  });
 });

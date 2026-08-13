@@ -29,6 +29,11 @@ describe('field presentation', () => {
     expect(isResourceFormField('services', 'Title')).toBe(true);
   });
 
+  it('hides manual ordering from profession forms', () => {
+    expect(isResourceFormField('professions', 'SortOrder')).toBe(false);
+    expect(isResourceFormField('professions', 'IconUrl')).toBe(true);
+  });
+
   it('requires campaign end time to be after start time', () => {
     expect(campaignDateError('2026-08-31T09:37', '2026-08-13T09:26')).toBe('Ngày kết thúc phải sau ngày bắt đầu.');
     expect(campaignDateError('2026-08-13T09:26', '2026-08-31T09:37')).toBe('');
