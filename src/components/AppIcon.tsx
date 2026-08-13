@@ -15,6 +15,7 @@ const paths: Record<string, ReactNode> = {
   database: <><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/></>,
   chevron: <path d="m9 18 6-6-6-6"/>,
   plus: <path d="M12 5v14M5 12h14"/>,
+  calendar: <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></>,
 };
 
 export function AppIcon({ name, ...props }: SVGProps<SVGSVGElement> & { name: string }) {
