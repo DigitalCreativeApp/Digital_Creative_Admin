@@ -13,6 +13,11 @@ export function isImageUrl(value: unknown) {
   } catch { return false; }
 }
 
+const campaignFormFields = new Set(['CoverUrl', 'StartsAt', 'EndsAt', 'IsFeatured', 'Status', 'TargetUrl']);
+export function isResourceFormField(resourceKey: string, fieldName: string) {
+  return resourceKey !== 'campaigns' || campaignFormFields.has(fieldName);
+}
+
 export type FieldGroup = 'media' | 'primary' | 'content' | 'status' | 'system';
 
 export function fieldGroup(name: string): FieldGroup {
@@ -22,4 +27,3 @@ export function fieldGroup(name: string): FieldGroup {
   if (/(description|content|bio|requirements|caption|tagline)/i.test(name)) return 'content';
   return 'primary';
 }
-

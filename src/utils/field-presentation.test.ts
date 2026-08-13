@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fieldGroup, isImageField, isImageUrl } from './field-presentation';
+import { fieldGroup, isImageField, isImageUrl, isResourceFormField } from './field-presentation';
 
 describe('field presentation', () => {
   it('recognizes image URL fields without treating every URL as an image', () => {
@@ -18,5 +18,14 @@ describe('field presentation', () => {
     expect(fieldGroup('CoverUrl')).toBe('media');
     expect(fieldGroup('Description')).toBe('content');
     expect(fieldGroup('CreatedAt')).toBe('system');
+  });
+
+  it('keeps campaign forms focused on banner configuration', () => {
+    expect(isResourceFormField('campaigns', 'CoverUrl')).toBe(true);
+    expect(isResourceFormField('campaigns', 'StartsAt')).toBe(true);
+    expect(isResourceFormField('campaigns', 'Title')).toBe(false);
+    expect(isResourceFormField('campaigns', 'Description')).toBe(false);
+    expect(isResourceFormField('campaigns', 'CallToAction')).toBe(false);
+    expect(isResourceFormField('services', 'Title')).toBe(true);
   });
 });
