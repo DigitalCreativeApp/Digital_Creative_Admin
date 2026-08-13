@@ -6,7 +6,7 @@ const fields: Record<string, string> = {
 };
 const hints: Record<string,string> = {CallToAction:'Chữ hiển thị trên nút, ví dụ: Tham gia ngay.',StartsAt:'Có thể nhập ngày giờ trực tiếp hoặc chọn từ lịch.',EndsAt:'Thời điểm chiến dịch ngừng hiển thị; có thể nhập hoặc chọn từ lịch.',TargetUrl:'Trang sẽ mở khi người dùng bấm nút kêu gọi.',IsFeatured:'Ưu tiên chiến dịch ở vị trí nổi bật trên ứng dụng.',Status:'Bản nháp chưa hiển thị; Đang hoạt động sẽ hiển thị theo thời gian đã chọn.'};
 const values: Record<string, string> = { Active:'Đang hoạt động',Inactive:'Ngừng hoạt động',Pending:'Đang chờ',Approved:'Đã duyệt',Rejected:'Đã từ chối',Completed:'Đã hoàn thành',Cancelled:'Đã hủy',Deleted:'Đã xóa',Draft:'Bản nháp',Published:'Đã đăng',Open:'Đang mở',Closed:'Đã đóng',Processing:'Đang xử lý',Failed:'Thất bại',Success:'Thành công',Admin:'Quản trị viên',Client:'Khách hàng',Creative:'Người sáng tạo',Member:'Thành viên',Owner:'Chủ phòng',Private:'Riêng tư',Group:'Nhóm',Text:'Văn bản',Image:'Hình ảnh',Video:'Video' };
-export const primaryResources = new Set(['accounts','services','portfolioprojects','inspirationposts','projects','serviceorders','conversations','reviews','reports','wallets','withdrawalrequests','disputes','campaigns','auditlogs']);
+export const primaryResources = new Set(['accounts','professions','services','portfolioprojects','inspirationposts','projects','serviceorders','conversations','reviews','reports','wallets','withdrawalrequests','disputes','campaigns','auditlogs']);
 export function resourceLabel(key:string,fallback?:string){return resources[key.toLowerCase()]||fallback||key;}
 export function fieldLabel(name:string){return fields[name]||name.replace(/Id$/,' (mã)');}
 export function fieldHint(name:string){return hints[name]||'';}
