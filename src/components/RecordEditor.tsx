@@ -10,7 +10,7 @@ type Props={resource:AdminResource;data:Record<string,unknown>;busy:boolean;onSa
 
 export function RecordEditor({resource,data,busy,onSave,onCancel}:Props){
  const fields=resource.fields.filter(x=>x.editable&&isResourceFormField(resource.key,x.name));
- const [values,setValues]=useState<Record<string,string>>(()=>Object.fromEntries(fields.map(x=>[x.name,x.type==='DateTimeOffset'?toVietnamDateTimeInput(data[x.name]):defaultEditorValue(x.type,x.options,data[x.name])])));
+ const [values,setValues]=useState<Record<string,string>>(()=>Object.fromEntries(fields.map(x=>[x.name,x.type==='DateTimeOffset'?toVietnamDateTimeInput(data[x.name]):resource.key==='professions'&&x.name==='Status'&&data[x.name]==null?'Active':defaultEditorValue(x.type,x.options,data[x.name])])));
  const [uploading,setUploading]=useState('');
  const [uploadError,setUploadError]=useState('');
  const [validationError,setValidationError]=useState('');

@@ -29,9 +29,13 @@ describe('field presentation', () => {
     expect(isResourceFormField('services', 'Title')).toBe(true);
   });
 
-  it('hides manual ordering from profession forms', () => {
+  it('keeps profession forms limited to name, optional icon and status', () => {
     expect(isResourceFormField('professions', 'SortOrder')).toBe(false);
+    expect(isResourceFormField('professions', 'Slug')).toBe(false);
+    expect(isResourceFormField('professions', 'Description')).toBe(false);
+    expect(isResourceFormField('professions', 'Name')).toBe(true);
     expect(isResourceFormField('professions', 'IconUrl')).toBe(true);
+    expect(isResourceFormField('professions', 'Status')).toBe(true);
   });
 
   it('requires campaign end time to be after start time', () => {

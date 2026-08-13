@@ -14,9 +14,10 @@ export function isImageUrl(value: unknown) {
 }
 
 const campaignFormFields = new Set(['CoverUrl', 'StartsAt', 'EndsAt', 'IsFeatured', 'Status', 'TargetUrl']);
+const professionFormFields = new Set(['Name', 'IconUrl', 'Status']);
 export function isResourceFormField(resourceKey: string, fieldName: string) {
   if (resourceKey === 'campaigns') return campaignFormFields.has(fieldName);
-  if (resourceKey === 'professions') return fieldName !== 'SortOrder';
+  if (resourceKey === 'professions') return professionFormFields.has(fieldName);
   return true;
 }
 
