@@ -8,3 +8,4 @@ export type AdminRelatedSection = { resource: string; total: number; items: Reco
 export type AdminOverview = { resource: string; id: string; sections: AdminRelatedSection[] };
 export type Dashboard = { resourceCount: number; totalRecords: number; activeAccounts: number; users: number; projects: number; services: number; portfolios: number; reports: number; transactions: number };
 export type BulkResult = { requested: number; succeeded: number; failed: number };
+export type PlatformFeeSetting = { rate: number; percentage: number; updatedAt: string | null; updatedByAccountId: string | null };

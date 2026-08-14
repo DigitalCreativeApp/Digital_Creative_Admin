@@ -1,8 +1,10 @@
 import { apiRequest, uploadRequest } from './api-client';
-import type { AdminOverview, AdminPage, AdminRecord, AdminResource, BulkResult, Dashboard } from '../types/admin.types';
+import type { AdminOverview, AdminPage, AdminRecord, AdminResource, BulkResult, Dashboard, PlatformFeeSetting } from '../types/admin.types';
 import { resourcePath } from './resource-path';
 export const adminService = {
   dashboard: () => apiRequest<Dashboard>('/api/admin/dashboard'),
+  platformFee: () => apiRequest<PlatformFeeSetting>('/api/admin/settings/platform-fee'),
+  updatePlatformFee: (percentage: number) => apiRequest<PlatformFeeSetting>('/api/admin/settings/platform-fee', { method: 'PUT', body: JSON.stringify({ percentage }) }),
   resources: () => apiRequest<AdminResource[]>('/api/admin/resources'),
   page: (key: string, page: number, pageSize: number, search: string, deleted: string, sort: string, descending: boolean) => apiRequest<AdminPage>(`${resourcePath(key)}?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(search)}&deleted=${deleted}&sort=${encodeURIComponent(sort)}&descending=${descending}`),
   record: (key: string, id: string) => apiRequest<AdminRecord>(resourcePath(key, id)),
