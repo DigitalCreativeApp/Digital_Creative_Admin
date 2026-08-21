@@ -6,6 +6,7 @@ import { useAuth } from '../store/auth-context';
 import { resourceGroup } from '../config/resource-groups';
 import { AppIcon } from '../components/AppIcon';
 import { primaryResources, resourceLabel } from '../config/admin-i18n';
+import { adminResourcePath } from '../routes/admin-navigation';
 
 const groupIcons: Record<string,string> = { 'Người dùng':'users','Nội dung sáng tạo':'content','Công việc và giao dịch':'projects','Cộng đồng':'operations','Tài chính':'finance','Vận hành':'system',Khác:'database' };
 
@@ -19,7 +20,7 @@ export function AdminLayout() {
   const location = useLocation();
   useEffect(() => { adminService.resources().then(setResources).catch(() => setResources([])); }, []);
   useEffect(() => setMobileOpen(false), [location.pathname]);
-  const filtered = useMemo(() => resources.filter(x => primaryResources.has(x.key) && `${resourceLabel(x.key,x.name)} ${x.table}`.toLowerCase().includes(query.trim().toLowerCase())), [resources, query]);
+  const filtered = useMemo(() => resources.filter(x => x.key !== 'withdrawalrequests' && primaryResources.has(x.key) && `${resourceLabel(x.key,x.name)} ${x.table}`.toLowerCase().includes(query.trim().toLowerCase())), [resources, query]);
   const groups = [...new Set(filtered.map(x => resourceGroup(x.key)))];
   const activeResource = resources.find(x => location.pathname.includes(`/resources/${x.key}`));
   function toggleCompact() { setCompact(value => { localStorage.setItem('admin_sidebar_compact', value ? '0' : '1'); return !value; }); }
@@ -37,7 +38,7 @@ export function AdminLayout() {
         <div className="nav-separator"><span>Không gian quản trị</span></div>
         {groups.map(group => <section className="nav-group" key={group}>
           <button className="nav-group-title" onClick={() => toggleGroup(group)} aria-expanded={!closedGroups.includes(group)}><span className="nav-icon"><AppIcon name={groupIcons[group]}/></span><span className="nav-text">{group}</span><AppIcon name="chevron" className={`group-arrow ${closedGroups.includes(group) ? '' : 'expanded'}`}/></button>
-          {!closedGroups.includes(group) && <div className="nav-group-items">{filtered.filter(x => resourceGroup(x.key) === group).map(x => <NavLink key={x.key} to={`/resources/${x.key}`} className="resource-link"><span className="resource-dot"/><span className="nav-text">{resourceLabel(x.key,x.name)}</span></NavLink>)}</div>}
+          {!closedGroups.includes(group) && <div className="nav-group-items">{filtered.filter(x => resourceGroup(x.key) === group).map(x => <NavLink key={x.key} to={adminResourcePath(x.key)} className="resource-link"><span className="resource-dot"/><span className="nav-text">{resourceLabel(x.key,x.name)}</span></NavLink>)}</div>}
         </section>)}
         {filtered.length === 0 && <p className="nav-empty">Không tìm thấy dữ liệu</p>}
       </nav>

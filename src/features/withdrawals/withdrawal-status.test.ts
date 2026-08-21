@@ -22,19 +22,19 @@ describe('admin withdrawal workflow', () => {
     vi.stubGlobal('fetch', fetchMock);
     const { adminService } = await import('../../services/admin.service');
 
-    await adminService.withdrawals({ page:1,pageSize:20,status:'PENDING' });
+    await adminService.withdrawals({ page: 1, pageSize: 20, status: 'PENDING' });
     await adminService.withdrawalStatistics();
     await adminService.withdrawal('withdrawal-id');
     await adminService.startWithdrawal('withdrawal-id');
-    await adminService.rejectWithdrawal('withdrawal-id','reason');
-    await adminService.failWithdrawal('withdrawal-id','reason',true);
-    await adminService.completeWithdrawal('withdrawal-id','FT123','note');
-    await adminService.uploadWithdrawalReceipt('withdrawal-id',new File(['receipt'],'receipt.pdf',{type:'application/pdf'}));
+    await adminService.rejectWithdrawal('withdrawal-id', 'reason');
+    await adminService.failWithdrawal('withdrawal-id', 'reason', true);
+    await adminService.completeWithdrawal('withdrawal-id', 'FT123', 'note');
+    await adminService.uploadWithdrawalReceipt('withdrawal-id', new File(['receipt'], 'receipt.pdf', { type: 'application/pdf' }));
 
-    const urls = fetchMock.mock.calls.map(([url])=>String(url));
-    expect(urls.some(url=>url.includes('/api/admin/withdrawals?page=1&pageSize=20&status=PENDING'))).toBe(true);
-    for (const path of ['statistics','withdrawal-id','start-processing','reject','fail','complete','receipt']) {
-      expect(urls.some(url=>url.endsWith(path))).toBe(true);
+    const urls = fetchMock.mock.calls.map(([url]) => String(url));
+    expect(urls.some(url => url.includes('/api/admin/withdrawals?page=1&pageSize=20&status=PENDING'))).toBe(true);
+    for (const path of ['statistics', 'withdrawal-id', 'start-processing', 'reject', 'fail', 'complete', 'receipt']) {
+      expect(urls.some(url => url.endsWith(path))).toBe(true);
     }
   });
 });
