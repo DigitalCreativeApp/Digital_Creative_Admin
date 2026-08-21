@@ -43,3 +43,12 @@ export function fieldGroup(name: string): FieldGroup {
   if (/(description|content|bio|requirements|caption|tagline)/i.test(name)) return 'content';
   return 'primary';
 }
+
+const recordHeadingFields = ['DisplayName', 'FullName', 'Name', 'Title', 'Email', 'Code', 'WithdrawalCode'];
+export function recordDisplayName(data: Record<string, unknown>, fallback: string) {
+  for (const field of recordHeadingFields) {
+    const value = data[field];
+    if ((typeof value === 'string' || typeof value === 'number') && String(value).trim()) return String(value).trim();
+  }
+  return fallback;
+}

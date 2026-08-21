@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { campaignDateError, defaultEditorValue, fieldGroup, isImageField, isImageUrl, isResourceFormField } from './field-presentation';
+import { campaignDateError, defaultEditorValue, fieldGroup, isImageField, isImageUrl, isResourceFormField, recordDisplayName } from './field-presentation';
 
 describe('field presentation', () => {
   it('recognizes image URL fields without treating every URL as an image', () => {
@@ -18,6 +18,12 @@ describe('field presentation', () => {
     expect(fieldGroup('CoverUrl')).toBe('media');
     expect(fieldGroup('Description')).toBe('content');
     expect(fieldGroup('CreatedAt')).toBe('system');
+  });
+
+  it('uses a human-readable value as the record heading', () => {
+    expect(recordDisplayName({ Id: 'technical-id', DisplayName: 'Nguyễn Minh' }, 'Tài khoản')).toBe('Nguyễn Minh');
+    expect(recordDisplayName({ Id: 'technical-id', Name: 'Thiết kế đồ họa' }, 'Ngành nghề')).toBe('Thiết kế đồ họa');
+    expect(recordDisplayName({ Id: 'technical-id' }, 'Bản ghi')).toBe('Bản ghi');
   });
 
   it('keeps campaign forms focused on banner configuration', () => {
