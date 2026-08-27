@@ -52,3 +52,19 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}, retry 
 export function uploadRequest<T>(path: string, form: FormData) {
   return apiRequest<T>(path, { method: 'POST', body: form });
 }
+
+export async function downloadRequest(path: string, retry = true): Promise<Blob> {
+  const headers = new Headers();
+  const requestToken = token;
+  if (requestToken) headers.set('Authorization', `Bearer ${requestToken}`);
+  const response = await fetch(`${env.apiUrl}${path}`, { headers, credentials: 'include' });
+  if (response.status === 401 && retry) {
+    const recovered = requestToken !== token || await refreshToken();
+    if (recovered) return downloadRequest(path, false);
+  }
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: 'Không thể tải tài liệu.' })) as { message?: string };
+    throw new Error(error.message || `Không thể tải tài liệu (${response.status}).`);
+  }
+  return response.blob();
+}

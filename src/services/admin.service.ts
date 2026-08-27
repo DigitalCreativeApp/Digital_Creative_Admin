@@ -1,5 +1,5 @@
-import { apiRequest, uploadRequest } from './api-client';
-import type { AdminOverview, AdminPage, AdminRecord, AdminResource, BulkResult, Dashboard, PlatformFeeSetting, WithdrawalDetail, WithdrawalFilters, WithdrawalPage, WithdrawalStatistics } from '../types/admin.types';
+import { apiRequest, downloadRequest, uploadRequest } from './api-client';
+import type { AdminOverview, AdminPage, AdminRecord, AdminResource, AgreementAcceptancePage, AgreementVersionInput, AgreementVersionUpdate, BulkResult, Dashboard, PlatformAgreement, PlatformAgreementVersion, PlatformFeeSetting, WithdrawalDetail, WithdrawalFilters, WithdrawalPage, WithdrawalStatistics } from '../types/admin.types';
 import { resourcePath } from './resource-path';
 export const adminService = {
   dashboard: () => apiRequest<Dashboard>('/api/admin/dashboard'),
@@ -17,6 +17,18 @@ export const adminService = {
   failWithdrawal: (id: string, reason: string, fundsMayHaveTransferred: boolean) => apiRequest<WithdrawalDetail>(`/api/admin/withdrawals/${id}/fail`, { method: 'POST', body: JSON.stringify({ reason, fundsMayHaveTransferred }) }),
   completeWithdrawal: (id: string, bankTransactionReference: string, adminNote: string) => apiRequest<WithdrawalDetail>(`/api/admin/withdrawals/${id}/complete`, { method: 'POST', body: JSON.stringify({ bankTransactionReference, adminNote }) }),
   uploadWithdrawalReceipt: (id: string, file: File) => { const form = new FormData(); form.append('file', file); return uploadRequest<WithdrawalDetail>(`/api/admin/withdrawals/${id}/receipt`, form); },
+  platformAgreements: () => apiRequest<PlatformAgreement[]>('/api/admin/platform-agreements'),
+  agreementVersion: (id: string) => apiRequest<PlatformAgreementVersion>(`/api/admin/platform-agreement-versions/${id}`),
+  createAgreementVersion: (agreementId: string, input: AgreementVersionInput) => apiRequest<PlatformAgreementVersion>(`/api/admin/platform-agreements/${agreementId}/versions`, { method: 'POST', body: JSON.stringify(input) }),
+  updateAgreementVersion: (id: string, input: AgreementVersionUpdate) => apiRequest<PlatformAgreementVersion>(`/api/admin/platform-agreement-versions/${id}`, { method: 'PATCH', body: JSON.stringify(input) }),
+  publishAgreementVersion: (id: string) => apiRequest<PlatformAgreementVersion>(`/api/admin/platform-agreement-versions/${id}/publish`, { method: 'POST' }),
+  cloneAgreementVersion: (id: string, version: string) => apiRequest<PlatformAgreementVersion>(`/api/admin/platform-agreement-versions/${id}/clone`, { method: 'POST', body: JSON.stringify({ version }) }),
+  agreementAcceptances: (id: string, page: number, pageSize: number, search = '') => {
+    const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+    if (search.trim()) query.set('search', search.trim());
+    return apiRequest<AgreementAcceptancePage>(`/api/admin/platform-agreement-versions/${id}/acceptances?${query}`);
+  },
+  agreementDocument: (acceptanceId: string) => downloadRequest(`/api/admin/platform-agreement-acceptances/${acceptanceId}/document`),
   resources: () => apiRequest<AdminResource[]>('/api/admin/resources'),
   page: (key: string, page: number, pageSize: number, search: string, deleted: string, sort: string, descending: boolean) => apiRequest<AdminPage>(`${resourcePath(key)}?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(search)}&deleted=${deleted}&sort=${encodeURIComponent(sort)}&descending=${descending}`),
   record: (key: string, id: string) => apiRequest<AdminRecord>(resourcePath(key, id)),
