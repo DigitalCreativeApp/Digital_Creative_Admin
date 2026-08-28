@@ -1,5 +1,5 @@
 import { apiRequest, downloadRequest, uploadRequest } from './api-client';
-import type { AdminOverview, AdminPage, AdminRecord, AdminResource, AgreementAcceptancePage, AgreementVersionInput, AgreementVersionUpdate, BulkResult, Dashboard, PlatformAgreement, PlatformAgreementVersion, PlatformFeeSetting, WithdrawalDetail, WithdrawalFilters, WithdrawalPage, WithdrawalStatistics } from '../types/admin.types';
+import type { AdminOverview, AdminPage, AdminRecord, AdminResource, AgreementAcceptancePage, AgreementVersionInput, AgreementVersionUpdate, BulkResult, Dashboard, DisputeDetail, DisputeFilters, DisputePage, DisputeResolution, PlatformAgreement, PlatformAgreementVersion, PlatformFeeSetting, WithdrawalDetail, WithdrawalFilters, WithdrawalPage, WithdrawalStatistics } from '../types/admin.types';
 import { resourcePath } from './resource-path';
 export const adminService = {
   dashboard: () => apiRequest<Dashboard>('/api/admin/dashboard'),
@@ -17,6 +17,14 @@ export const adminService = {
   failWithdrawal: (id: string, reason: string, fundsMayHaveTransferred: boolean) => apiRequest<WithdrawalDetail>(`/api/admin/withdrawals/${id}/fail`, { method: 'POST', body: JSON.stringify({ reason, fundsMayHaveTransferred }) }),
   completeWithdrawal: (id: string, bankTransactionReference: string, adminNote: string) => apiRequest<WithdrawalDetail>(`/api/admin/withdrawals/${id}/complete`, { method: 'POST', body: JSON.stringify({ bankTransactionReference, adminNote }) }),
   uploadWithdrawalReceipt: (id: string, file: File) => { const form = new FormData(); form.append('file', file); return uploadRequest<WithdrawalDetail>(`/api/admin/withdrawals/${id}/receipt`, form); },
+  disputes: (filters: DisputeFilters) => {
+    const query = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => { if (value !== undefined && value !== '') query.set(key, String(value)); });
+    return apiRequest<DisputePage>(`/api/admin/disputes?${query}`);
+  },
+  dispute: (id: string) => apiRequest<DisputeDetail>(`/api/admin/disputes/${id}`),
+  requestDisputeEvidence: (id: string, reason: string) => apiRequest(`/api/admin/disputes/${id}/request-evidence`, { method: 'POST', body: JSON.stringify({ reason }) }),
+  resolveDispute: (id: string, resolution: DisputeResolution, proposedCreatorAmount: number | null, reason: string) => apiRequest(`/api/admin/disputes/${id}/resolve`, { method: 'POST', body: JSON.stringify({ resolution, proposedCreatorAmount, reason }) }),
   platformAgreements: () => apiRequest<PlatformAgreement[]>('/api/admin/platform-agreements'),
   agreementVersion: (id: string) => apiRequest<PlatformAgreementVersion>(`/api/admin/platform-agreement-versions/${id}`),
   createAgreementVersion: (agreementId: string, input: AgreementVersionInput) => apiRequest<PlatformAgreementVersion>(`/api/admin/platform-agreements/${agreementId}/versions`, { method: 'POST', body: JSON.stringify(input) }),

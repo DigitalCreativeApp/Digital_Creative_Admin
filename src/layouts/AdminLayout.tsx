@@ -7,6 +7,7 @@ import { resourceGroup } from '../config/resource-groups';
 import { AppIcon } from '../components/AppIcon';
 import { primaryResources, resourceLabel } from '../config/admin-i18n';
 import { adminResourcePath } from '../routes/admin-navigation';
+import { WORK_ORDER_DISPUTES_VISIBLE } from '../config/feature-flags';
 
 const groupIcons: Record<string,string> = { 'Người dùng':'users','Nội dung sáng tạo':'content','Công việc và giao dịch':'projects','Cộng đồng':'operations','Tài chính':'finance','Vận hành':'system',Khác:'database' };
 
@@ -35,6 +36,7 @@ export function AdminLayout() {
         <NavLink to="/" end className="nav-item"><span className="nav-icon"><AppIcon name="dashboard"/></span><span className="nav-text">Tổng quan</span></NavLink>
         <NavLink to="/settings/platform-fee" className="nav-item"><span className="nav-icon"><AppIcon name="finance"/></span><span className="nav-text">Cấu hình phí</span></NavLink>
         <NavLink to="/admin/withdrawals" className="nav-item"><span className="nav-icon"><AppIcon name="finance"/></span><span className="nav-text">Yêu cầu rút tiền</span></NavLink>
+        {WORK_ORDER_DISPUTES_VISIBLE ? <NavLink to="/admin/disputes" className="nav-item"><span className="nav-icon"><AppIcon name="operations"/></span><span className="nav-text">Tranh chấp công việc</span></NavLink> : null}
         <NavLink to="/admin/agreements" className="nav-item"><span className="nav-icon"><AppIcon name="system"/></span><span className="nav-text">Pháp lý & thỏa thuận</span></NavLink>
         <div className="nav-separator"><span>Không gian quản trị</span></div>
         {groups.map(group => <section className="nav-group" key={group}>

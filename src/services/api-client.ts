@@ -1,10 +1,12 @@
 import { env } from '../config/env';
 
-let token: string | null = sessionStorage.getItem('admin_access_token');
+const storage = typeof sessionStorage === 'undefined' ? null : sessionStorage;
+let token: string | null = storage?.getItem('admin_access_token') ?? null;
 let refreshPromise: Promise<boolean> | null = null;
 export const setAccessToken = (value: string | null) => {
   token = value;
-  value ? sessionStorage.setItem('admin_access_token', value) : sessionStorage.removeItem('admin_access_token');
+  if (value) storage?.setItem('admin_access_token', value);
+  else storage?.removeItem('admin_access_token');
 };
 
 async function performTokenRefresh() {
