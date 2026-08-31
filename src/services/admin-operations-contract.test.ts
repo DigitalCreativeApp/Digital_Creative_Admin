@@ -12,7 +12,9 @@ describe('admin operations API contract', () => {
     }));
 
     await adminService.users({ page:1, pageSize:20, search:'lan', role:'CREATIVE', status:'ACTIVE' });
+    await adminService.user('account-id');
 
     expect(calls[0]).toContain('/api/admin/operations/users?page=1&pageSize=20&search=lan&role=CREATIVE&status=ACTIVE');
+    expect(calls[1]).toContain('/api/admin/operations/users/account-id');
   });
 });

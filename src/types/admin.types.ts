@@ -11,6 +11,7 @@ export type Dashboard = { activeAccounts:number;users:number;projects:number;ope
 export type OperationPage<T> = { items:T[];page:number;pageSize:number;total:number };
 export type AdminUserListItem = { accountId:string;userId:string|null;email:string;phone:string|null;displayName:string;role:string;accountStatus:string;profileStatus:string|null;isVerified:boolean;lastLoginAt:string|null;createdAt:string };
 export type AdminUserFilters = { page:number;pageSize:number;search?:string;role?:string;status?:string };
+export type AdminUserDetail = { accountId:string;userId:string|null;email:string;phone:string|null;displayName:string;fullName:string|null;jobTitle:string|null;avatarUrl:string|null;province:string|null;country:string|null;role:string;accountStatus:string;profileStatus:string|null;isVerified:boolean;isAvailableForWork:boolean;lastLoginAt:string|null;createdAt:string;projectCount:number;serviceCount:number;workOrderCount:number;availableBalance:number;lockedBalance:number;pendingWithdrawalBalance:number };
 export type BulkResult = { requested: number; succeeded: number; failed: number };
 export type PlatformFeeSetting = { rate: number; percentage: number; updatedAt: string | null; updatedByAccountId: string | null };
 export type WithdrawalStatus = 'PENDING'|'PROCESSING'|'COMPLETED'|'REJECTED'|'FAILED'|'CANCELLED';

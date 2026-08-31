@@ -1,5 +1,5 @@
 import { apiRequest, downloadRequest, uploadRequest } from './api-client';
-import type { AdminOverview, AdminPage, AdminRecord, AdminResource, AdminUserFilters, AdminUserListItem, AgreementAcceptancePage, AgreementVersionInput, AgreementVersionUpdate, BulkResult, Dashboard, DisputeDetail, DisputeFilters, DisputePage, DisputeResolution, OperationPage, PlatformAgreement, PlatformAgreementVersion, PlatformFeeSetting, WithdrawalDetail, WithdrawalFilters, WithdrawalPage, WithdrawalStatistics } from '../types/admin.types';
+import type { AdminOverview, AdminPage, AdminRecord, AdminResource, AdminUserDetail, AdminUserFilters, AdminUserListItem, AgreementAcceptancePage, AgreementVersionInput, AgreementVersionUpdate, BulkResult, Dashboard, DisputeDetail, DisputeFilters, DisputePage, DisputeResolution, OperationPage, PlatformAgreement, PlatformAgreementVersion, PlatformFeeSetting, WithdrawalDetail, WithdrawalFilters, WithdrawalPage, WithdrawalStatistics } from '../types/admin.types';
 import { resourcePath } from './resource-path';
 export const adminService = {
   dashboard: () => apiRequest<Dashboard>('/api/admin/dashboard'),
@@ -8,6 +8,7 @@ export const adminService = {
     Object.entries(filters).forEach(([key,value]) => { if (value !== undefined && value !== '') query.set(key,String(value)); });
     return apiRequest<OperationPage<AdminUserListItem>>(`/api/admin/operations/users?${query}`);
   },
+  user: (accountId:string) => apiRequest<AdminUserDetail>(`/api/admin/operations/users/${accountId}`),
   platformFee: () => apiRequest<PlatformFeeSetting>('/api/admin/settings/platform-fee'),
   updatePlatformFee: (percentage: number) => apiRequest<PlatformFeeSetting>('/api/admin/settings/platform-fee', { method: 'PUT', body: JSON.stringify({ percentage }) }),
   withdrawals: (filters: WithdrawalFilters) => {
