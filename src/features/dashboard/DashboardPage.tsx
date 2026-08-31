@@ -3,30 +3,42 @@ import { Link } from 'react-router-dom';
 import { adminService } from '../../services/admin.service';
 import type { Dashboard } from '../../types/admin.types';
 import { ErrorState, LoadingState } from '../../components/AsyncState';
-import { AppIcon } from '../../components/AppIcon';
-
-const metrics: { key: keyof Dashboard; label: string; hint: string; icon: string; tone: string }[] = [
-  { key: 'activeAccounts', label: 'Tài khoản hoạt động', hint: 'Đang có quyền truy cập', icon: 'users', tone: 'purple' },
-  { key: 'projects', label: 'Tổng dự án', hint: 'Mọi trạng thái dự án', icon: 'projects', tone: 'orange' },
-  { key: 'services', label: 'Dịch vụ sáng tạo', hint: 'Dịch vụ trong hệ thống', icon: 'content', tone: 'blue' },
-  { key: 'transactions', label: 'Giao dịch', hint: 'Bản ghi tài chính', icon: 'finance', tone: 'green' },
-];
+import { AdminPageHeader, KpiCard, StatusBadge } from '../../components/admin/AdminUi';
+import { formatAdminDateTime, formatAdminId, formatAdminMoney, formatAdminNumber } from '../../utils/admin-presentation';
+import { dashboardActionLabel, dashboardAttention } from './dashboard-presentation';
 
 export function DashboardPage() {
-  const [data, setData] = useState<Dashboard>(); const [error, setError] = useState('');
+  const [data, setData] = useState<Dashboard>();
+  const [error, setError] = useState('');
   const load = () => { setError(''); adminService.dashboard().then(setData).catch(reason => setError(reason.message)); };
   useEffect(load, []);
   if (error) return <ErrorState message={error} retry={load} />;
   if (!data) return <LoadingState variant="dashboard" />;
-  return <>
-    <section className="dashboard-hero"><div><span className="eyebrow">Trung tâm điều hành</span><h1>Tổng quan hệ thống</h1><p>Theo dõi dữ liệu và xử lý các hoạt động quan trọng trên Digital Creative.</p></div><div className="live-badge"><span/><div><strong>Dữ liệu trực tiếp</strong><small>Cập nhật từ PostgreSQL</small></div></div></section>
-    <section className="metric-grid" aria-label="Chỉ số tổng quan">{metrics.map(item => <article className="metric-card" key={item.key}><div className={`metric-icon ${item.tone}`}><AppIcon name={item.icon}/></div><div className="metric-copy"><span>{item.label}</span><strong>{data[item.key].toLocaleString('vi-VN')}</strong><small>{item.hint}</small></div><span className="metric-line"/></article>)}</section>
-    <section className="finance-overview" aria-label="Tổng quan tài chính"><header><div><span className="section-kicker">Tài chính</span><h2>Dòng tiền nền tảng</h2></div><Link to="/admin/withdrawals?status=pending">Xem yêu cầu rút tiền →</Link></header><div>{[['Số dư khả dụng',data.availableUserBalance],['Ký quỹ',data.escrowBalance],['Chờ rút',data.pendingWithdrawal],['Đã rút',data.completedWithdrawal],['Doanh thu nền tảng',data.platformRevenue]].map(([label,value])=><article key={String(label)}><span>{label}</span><strong>{formatVnd(Number(value))}</strong>{label==='Chờ rút'?<small>{data.pendingWithdrawalCount.toLocaleString('vi-VN')} yêu cầu</small>:null}</article>)}</div></section>
-    <section className="dashboard-grid"><article className="overview-panel"><header><div><span className="section-kicker">Cơ sở dữ liệu</span><h2>Quy mô nền tảng</h2></div><span className="panel-badge">{data.resourceCount} nhóm dữ liệu</span></header><div className="database-visual"><div className="database-ring"><AppIcon name="database"/><strong>{compactNumber(data.totalRecords)}</strong><span>Tổng bản ghi</span></div><div className="database-breakdown"><DataRow label="Người dùng" value={data.users}/><DataRow label="Portfolio" value={data.portfolios}/><DataRow label="Báo cáo cần quản lý" value={data.reports}/></div></div></article><article className="quick-panel"><header><span className="section-kicker">Truy cập nhanh</span><h2>Khu vực thường dùng</h2></header><div className="quick-links"><QuickLink to="/resources/accounts" icon="users" title="Tài khoản" text="Khóa, xác minh và quản lý truy cập"/><QuickLink to="/resources/reports" icon="operations" title="Báo cáo" text="Kiểm duyệt nội dung bị báo cáo"/><QuickLink to="/admin/withdrawals" icon="finance" title="Yêu cầu rút tiền" text="Theo dõi quy trình thanh toán"/><QuickLink to="/resources/auditlogs" icon="system" title="Nhật ký hệ thống" text="Kiểm tra hoạt động quản trị"/></div></article></section>
-  </>;
+
+  const attention = dashboardAttention(data);
+  return <div className="ops-dashboard">
+    <AdminPageHeader eyebrow="Trung tâm điều hành" title="Tổng quan vận hành" description="Theo dõi sức khỏe marketplace, xử lý hàng đợi rủi ro và đối soát dòng tiền từ dữ liệu trực tiếp." status={<StatusBadge label="Dữ liệu trực tiếp" tone="success"/>}/>
+
+    <section aria-labelledby="marketplace-heading"><SectionHeading id="marketplace-heading" title="Marketplace" description="Quy mô hiện tại và các luồng đang hoạt động."/><div className="ops-kpi-grid">
+      <KpiCard label="Tài khoản hoạt động" value={formatAdminNumber(data.activeAccounts)} helper={`${formatAdminNumber(data.users)} hồ sơ người dùng`} tone="success" to="/resources/accounts"/>
+      <KpiCard label="Dự án đang mở" value={formatAdminNumber(data.openProjects)} helper={`${formatAdminNumber(data.projects)} dự án toàn hệ thống`} tone="info" to="/resources/projects"/>
+      <KpiCard label="Dịch vụ đang hoạt động" value={formatAdminNumber(data.activeServices)} helper={`${formatAdminNumber(data.services)} dịch vụ toàn hệ thống`} tone="info" to="/resources/services"/>
+      <KpiCard label="Work Order đang chạy" value={formatAdminNumber(data.activeWorkOrders)} helper={`${formatAdminNumber(data.workOrders)} Work Order tổng cộng`} tone="warning" to="/resources/workorders"/>
+    </div></section>
+
+    <div className="ops-dashboard-columns">
+      <section className="ops-panel" aria-labelledby="attention-heading"><SectionHeading id="attention-heading" title="Cần xử lý" description="Hàng đợi được sắp theo số lượng hồ sơ hiện tại."/><div className="ops-attention-list">{attention.map(item => <Link to={item.to} key={item.label}><StatusBadge label={item.count ? `${formatAdminNumber(item.count)} hồ sơ` : 'Không có'} tone={item.count ? item.tone : 'neutral'}/><span><strong>{item.label}</strong><small>{item.count ? 'Mở hàng đợi và tiếp tục xử lý' : 'Không có hồ sơ tồn đọng'}</small></span><span aria-hidden="true">→</span></Link>)}</div></section>
+      <section className="ops-panel" aria-labelledby="activity-heading"><SectionHeading id="activity-heading" title="Hoạt động gần đây" description="Các thay đổi quản trị được ghi nhận trong Audit Log."/>{data.recentActivity.length ? <ol className="ops-activity-list">{data.recentActivity.map(item => <li key={item.id}><span className="ops-activity-mark" aria-hidden="true"/><div><strong>{dashboardActionLabel(item.action)}</strong><span>{item.entityType}{item.entityId ? ` · ${formatAdminId(item.entityId)}` : ''}</span><small>{item.actor} · {formatAdminDateTime(item.createdAt)}</small></div></li>)}</ol> : <div className="ops-inline-empty">Chưa có hoạt động quản trị được ghi nhận.</div>}</section>
+    </div>
+
+    <section className="ops-panel ops-finance" aria-labelledby="finance-heading"><SectionHeading id="finance-heading" title="Dòng tiền nền tảng" description={`${formatAdminNumber(data.transactions)} giao dịch được ghi nhận.`}/><div className="ops-finance-grid"><FinanceValue label="Số dư khả dụng" value={data.availableUserBalance}/><FinanceValue label="Tiền đang giữ" value={data.escrowBalance}/><FinanceValue label="Chờ rút" value={data.pendingWithdrawal} helper={`${formatAdminNumber(data.pendingWithdrawalCount)} yêu cầu`}/><FinanceValue label="Đã rút" value={data.completedWithdrawal}/><FinanceValue label="Doanh thu nền tảng" value={data.platformRevenue}/></div><Link className="ops-panel-link" to="/resources/wallettransactions">Mở sổ giao dịch →</Link></section>
+  </div>;
 }
 
-function DataRow({ label, value }: { label: string; value: number }) { return <div><span>{label}</span><strong>{value.toLocaleString('vi-VN')}</strong></div>; }
-function QuickLink({ to, icon, title, text }: { to: string; icon: string; title: string; text: string }) { return <Link to={to}><span className="quick-icon"><AppIcon name={icon}/></span><span><strong>{title}</strong><small>{text}</small></span><AppIcon name="chevron" className="quick-arrow"/></Link>; }
-function compactNumber(value: number) { return new Intl.NumberFormat('vi-VN', { notation: 'compact', maximumFractionDigits: 1 }).format(value); }
-function formatVnd(value:number){return new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(value)}
+function SectionHeading({ id, title, description }: { id:string;title:string;description:string }) {
+  return <header className="ops-section-heading"><div><h2 id={id}>{title}</h2><p>{description}</p></div></header>;
+}
+
+function FinanceValue({ label, value, helper }: { label:string;value:number;helper?:string }) {
+  return <article><span>{label}</span><strong>{formatAdminMoney(value)}</strong>{helper ? <small>{helper}</small> : null}</article>;
+}
