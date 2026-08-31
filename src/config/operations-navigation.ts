@@ -5,9 +5,9 @@ export const operationsNavigation: OperationsNavGroup[] = [
   { label: 'Điều hành', items: [
     { label: 'Tổng quan', to: '/', icon: 'dashboard' },
     { label: 'Người dùng', to: '/admin/users', icon: 'users' },
-    { label: 'Dự án', to: '/resources/projects', icon: 'projects' },
-    { label: 'Dịch vụ', to: '/resources/services', icon: 'content' },
-    { label: 'Work Orders', to: '/resources/workorders', icon: 'projects' },
+    { label: 'Dự án', to: '/admin/projects', icon: 'projects' },
+    { label: 'Dịch vụ', to: '/admin/services', icon: 'content' },
+    { label: 'Work Orders', to: '/admin/work-orders', icon: 'projects' },
   ] },
   { label: 'Tài chính & rủi ro', items: [
     { label: 'Tài chính', to: '/resources/wallettransactions', icon: 'finance' },
