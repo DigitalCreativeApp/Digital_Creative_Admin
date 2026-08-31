@@ -4,7 +4,7 @@ export type OperationsNavGroup = { label: string; items: OperationsNavItem[] };
 export const operationsNavigation: OperationsNavGroup[] = [
   { label: 'Điều hành', items: [
     { label: 'Tổng quan', to: '/', icon: 'dashboard' },
-    { label: 'Người dùng', to: '/resources/accounts', icon: 'users' },
+    { label: 'Người dùng', to: '/admin/users', icon: 'users' },
     { label: 'Dự án', to: '/resources/projects', icon: 'projects' },
     { label: 'Dịch vụ', to: '/resources/services', icon: 'content' },
     { label: 'Work Orders', to: '/resources/workorders', icon: 'projects' },

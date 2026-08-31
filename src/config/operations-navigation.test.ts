@@ -10,7 +10,7 @@ describe('operations navigation', () => {
 
   it('resolves the most specific route label', () => {
     expect(operationsRouteLabel('/admin/withdrawals/123')).toBe('Rút tiền');
-    expect(operationsRouteLabel('/resources/accounts/123')).toBe('Người dùng');
+    expect(operationsRouteLabel('/admin/users')).toBe('Người dùng');
     expect(operationsRouteLabel('/')).toBe('Tổng quan');
   });
 });
