@@ -17,6 +17,8 @@
   --ops-shadow: 0 1px 2px rgb(23 32 38 / 6%);
 }
 
+.ops-nav-group { margin:.25rem 0 1rem; }.ops-nav-group h2 { margin:0 1rem .35rem; color:var(--ops-text-muted); font-size:.65rem; font-weight:750; letter-spacing:.09em; text-transform:uppercase; }.sidebar-compact .ops-nav-group h2 { height:1px; margin:.5rem; overflow:hidden; opacity:0; }.ops-nav-group .nav-item { margin:.12rem .55rem; }
+
 .ops-page-header { display:flex; align-items:flex-end; justify-content:space-between; gap:2rem; margin-bottom:1.5rem; }
 .ops-page-heading { max-width:760px; }
 .ops-eyebrow { display:block; margin-bottom:.45rem; color:var(--ops-accent); font-size:.75rem; font-weight:750; letter-spacing:.08em; text-transform:uppercase; }
